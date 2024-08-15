@@ -278,7 +278,7 @@ namespace Gibbed.EFX.Export
             Export((SchedulerBase)scheduler, table);
             table["u10"] = scheduler.Unknown10;
             table["u11"] = scheduler.Unknown11;
-            table["u12"] = scheduler.AttachId;
+            table["attach_id"] = scheduler.AttachId;
             table["u1C"] = scheduler.Unknown1C;
         }
 
