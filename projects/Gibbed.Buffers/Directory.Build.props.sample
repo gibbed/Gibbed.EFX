@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <GibbedBuffers_TargetFrameworksToBuild>net5.0</GibbedBuffers_TargetFrameworksToBuild>
+  </PropertyGroup>
+</Project>

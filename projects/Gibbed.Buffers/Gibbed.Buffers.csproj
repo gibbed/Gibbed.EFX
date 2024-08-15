@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Company>Gibbed</Company>
+    <Authors>Gibbed</Authors>
+    <Description>https://gib.me/</Description>
+    <Copyright>Copyright © Gibbed 2024</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(GibbedBuffers_TargetFrameworksToBuild)' == '' ">
+    <GibbedBuffers_TargetFrameworksToBuild>$(TargetFrameworksToBuild)</GibbedBuffers_TargetFrameworksToBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(GibbedBuffers_TargetFrameworksToBuild)' == '' ">
+    <TargetFrameworks>net45;net472;net48</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(GibbedBuffers_TargetFrameworksToBuild)' != '' ">
+    <TargetFrameworks>$(GibbedBuffers_TargetFrameworksToBuild)</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Microsoft.Extensions.ObjectPool">
+      <Version>8.0.8</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.Extensions.ObjectPool">
+      <Version>8.0.8</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".git*" />
+  </ItemGroup>
+</Project>
