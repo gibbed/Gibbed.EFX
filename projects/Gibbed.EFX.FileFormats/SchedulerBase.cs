@@ -60,7 +60,7 @@ namespace Gibbed.EFX.FileFormats
             this.TimelineEnd = span.ReadValueS32(ref index, endian);
 
             if ((this.Unknown2 != 0 && this.Unknown2 != 1) ||
-                (this.Unknown5 != 0 && this.Unknown5 != 1))
+                (this.Unknown5 != 0 && this.Unknown5 != 1 && this.Unknown5 != 3))
             {
                 throw new FormatException();
             }
