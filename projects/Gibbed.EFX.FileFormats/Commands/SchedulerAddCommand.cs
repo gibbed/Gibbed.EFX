@@ -85,14 +85,7 @@ namespace Gibbed.EFX.FileFormats.Commands
             var schedulerId = this.SchedulerId = span.ReadValueU8(ref index);
             var schedulerType = (SchedulerType)span.ReadValueU8(ref index);
             span.SkipPadding(ref index, paddingSize);
-            BaseScheduler scheduler = this.Scheduler = schedulerType switch
-            {
-                SchedulerType.Unknown0 => new Unknown0Scheduler(),
-                SchedulerType.Unknown1 => new Unknown1Scheduler(),
-                SchedulerType.Unknown2 => new Unknown2Scheduler(),
-                SchedulerType.Unknown3 => new Unknown3Scheduler(),
-                _ => throw new NotSupportedException(),
-            };
+            var scheduler = this.Scheduler = SchedulerFactory.Create(schedulerType);
             scheduler.Id = schedulerId;
             scheduler.Deserialize(span, ref index, target, endian);
             this.Padding = index < span.Length ? span.Slice(index).ToArray() : null;

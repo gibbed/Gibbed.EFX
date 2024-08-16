@@ -26,6 +26,8 @@ namespace Gibbed.EFX.FileFormats
 {
     public enum CommandOpcode : ushort
     {
+        Invalid = 0,
+
         [Obsolete] Mode = 0x400, // EFFCMD_MODE
         [Obsolete] ViewMatrix = 0x401, // [F] EFFCMD_VIEWMATRIX
         [Obsolete] TexView = 0x402, // EFFCMD_TEXVIEW

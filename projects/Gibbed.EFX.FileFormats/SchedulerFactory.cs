@@ -20,17 +20,20 @@
  *    distribution.
  */
 
-using Gibbed.EFX.FileFormats.Commands;
+using System;
+using Gibbed.EFX.FileFormats.Schedulers;
 
 namespace Gibbed.EFX.FileFormats
 {
-    public static class CommandFactory
+    public static class SchedulerFactory
     {
-        public static ICommand Create(this CommandOpcode opcode) => opcode switch
+        public static BaseScheduler Create(this SchedulerType type) => type switch
         {
-            CommandOpcode.ResourceAdd => new ResourceAddCommand(),
-            CommandOpcode.SchedulerAdd => new SchedulerAddCommand(),
-            _ => new UnhandledCommand(opcode),
+            SchedulerType.Unknown0 => new Unknown0Scheduler(),
+            SchedulerType.Unknown1 => new Unknown1Scheduler(),
+            SchedulerType.Unknown2 => new Unknown2Scheduler(),
+            SchedulerType.Unknown3 => new Unknown3Scheduler(),
+            _ => throw new NotSupportedException(),
         };
 
     }

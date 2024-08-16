@@ -24,6 +24,8 @@ namespace Gibbed.EFX.FileFormats
 {
     public enum ResourceType : byte
     {
+        Invalid = 0,
+
         Unknown50 = 0x50,
         Unknown51 = 0x51,
         Texture = 0x52,

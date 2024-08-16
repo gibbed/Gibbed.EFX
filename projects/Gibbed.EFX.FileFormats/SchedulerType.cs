@@ -28,5 +28,7 @@ namespace Gibbed.EFX.FileFormats
         Unknown1 = 1, // TOPSP, TOR, FFXII
         Unknown2 = 2, // TOPSP, TOR, FFXII
         Unknown3 = 3, // FFXII
+
+        Invalid = 0xFF,
     }
 }

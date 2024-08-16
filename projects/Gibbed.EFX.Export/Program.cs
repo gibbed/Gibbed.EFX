@@ -156,9 +156,14 @@ namespace Gibbed.EFX.Export
 
             Tommy.TomlTable rootTable = new();
 
+            if (effect.Endian != Endian.Little)
+            {
+                rootTable["endian"] = effect.Endian.ToString();
+            }
+
             rootTable["game"] = effect.Target.Game.ToString();
             rootTable["version"] = effect.Target.Version;
-
+            rootTable["unknown"] = effect.Unknown;
             rootTable["commands"] = commandsArray;
 
             StringBuilder sb = new();
@@ -219,7 +224,7 @@ namespace Gibbed.EFX.Export
 
             if (command.Padding?.Length > 0)
             {
-                table["padding"] = BitConverter.ToString(command.Padding).ToUpperInvariant().Replace("-", " ");
+                table["padding"] = Export(command.Padding);
             }
         }
 
@@ -277,7 +282,7 @@ namespace Gibbed.EFX.Export
         private static void Export(Unknown2Sub action, Tommy.TomlTable table)
         {
             table["type"] = action.Type;
-            table["u1"] = BitConverter.ToString(action.Unknown).ToUpperInvariant().Replace("-", " ");
+            table["u1"] = Export(action.Unknown);
         }
 
         private static void Export(Unknown3Scheduler scheduler, Tommy.TomlTable table)
@@ -287,6 +292,22 @@ namespace Gibbed.EFX.Export
             table["u11"] = scheduler.Unknown11;
             table["attach_id"] = scheduler.AttachId;
             table["u1C"] = scheduler.Unknown1C;
+        }
+
+        private static Tommy.TomlNode Export(byte[] bytes)
+        {
+            Tommy.TomlArray array = new();
+            foreach (var value in bytes)
+            {
+                array.Add(new Tommy.TomlInteger()
+                {
+                    IntegerBase = value != 0
+                        ? Tommy.TomlInteger.Base.Hexadecimal
+                        : Tommy.TomlInteger.Base.Decimal,
+                    Value = value,
+                });
+            }
+            return array;
         }
 
         private static void CreatePath(string path)
