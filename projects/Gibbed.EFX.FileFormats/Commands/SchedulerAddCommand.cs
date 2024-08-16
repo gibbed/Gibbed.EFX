@@ -21,60 +21,81 @@
  */
 
 using System;
-using System.Linq;
+using System.Buffers;
+using Gibbed.EFX.FileFormats.Schedulers;
 using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats.Commands
 {
-    public class SchedulerAddCommand : ICommand
+    public class SchedulerAddCommand : BaseCommand
     {
-        public CommandOpcode Opcode => CommandOpcode.SchedulerAdd;
+        public override CommandOpcode Opcode => CommandOpcode.SchedulerAdd;
+        protected override int DataOffsetDelta => 4;
 
         public ushort MetaId { get; set; }
         public byte PageId { get; set; }
         public byte SchedulerId { get; set; }
-        public SchedulerBase Scheduler { get; set; }
+        public BaseScheduler Scheduler { get; set; }
+        public byte[] Padding { get; set; }
 
-        public static SchedulerAddCommand Read(ReadOnlySpan<byte> span, Target gameVersion, Endian endian)
+        private static int GetPaddingSize(Target target)
+        {
+            return target.Version < 11 ? 12 : 11;
+        }
+
+        protected override void Serialize(IBufferWriter<byte> writer, Target target, Endian endian)
+        {
+            if (this.Scheduler == null)
+            {
+                throw new InvalidOperationException($"{nameof(Scheduler)} is null");
+            }
+
+            if (target.Version < 11)
+            {
+                if (this.MetaId > byte.MaxValue)
+                {
+                    throw new InvalidOperationException($"{nameof(MetaId)} is too big");
+                }
+                writer.WriteValueU8((byte)this.MetaId);
+            }
+            else
+            {
+                writer.WriteValueU16(this.MetaId, endian);
+            }
+
+            writer.WriteValueU8(this.PageId);
+            writer.WriteValueU8(this.SchedulerId);
+            writer.WriteValueU8((byte)this.Scheduler.Type);
+            writer.SkipPadding(GetPaddingSize(target));
+            this.Scheduler.Serialize(writer, target, endian);
+            if (this.Padding != null)
+            {
+                writer.Write(this.Padding);
+            }
+        }
+
+        public override void Deserialize(ReadOnlySpan<byte> span, int dataOffset, Target target, Endian endian)
         {
             int index = 0;
-            var metaId = gameVersion.Version < 11
+            var paddingSize = GetPaddingSize(target);
+            this.MetaId = target.Version < 11
                 ? span.ReadValueU8(ref index)
                 : span.ReadValueU16(ref index, endian);
-            var pageId = span.ReadValueU8(ref index);
-            var schedulerId = span.ReadValueU8(ref index);
+            this.PageId = span.ReadValueU8(ref index);
+            var schedulerId = this.SchedulerId = span.ReadValueU8(ref index);
             var schedulerType = (SchedulerType)span.ReadValueU8(ref index);
-
-            var paddingSize = gameVersion.Version < 11
-                ? 12
-                : 11;
-            var padding = span.Slice(index, paddingSize);
-            foreach (var b in padding)
+            span.SkipPadding(ref index, paddingSize);
+            BaseScheduler scheduler = this.Scheduler = schedulerType switch
             {
-                if (b != 0)
-                {
-                    throw new FormatException();
-                }
-            }
-            index += paddingSize;
-
-            SchedulerBase scheduler = schedulerType switch
-            {
-                SchedulerType.Unknown0 => new SchedulerUnknown0(),
-                SchedulerType.Unknown1 => new SchedulerUnknown1(),
-                SchedulerType.Unknown2 => new SchedulerUnknown2(),
-                SchedulerType.Unknown3 => new SchedulerUnknown3(),
+                SchedulerType.Unknown0 => new Unknown0Scheduler(),
+                SchedulerType.Unknown1 => new Unknown1Scheduler(),
+                SchedulerType.Unknown2 => new Unknown2Scheduler(),
+                SchedulerType.Unknown3 => new Unknown3Scheduler(),
                 _ => throw new NotSupportedException(),
             };
-            //scheduler.Id = schedulerId;
-            scheduler.Deserialize(span, ref index, gameVersion, endian);
-            return new()
-            {
-                MetaId = metaId,
-                PageId = pageId,
-                SchedulerId = schedulerId,
-                Scheduler = scheduler,
-            };
+            scheduler.Id = schedulerId;
+            scheduler.Deserialize(span, ref index, target, endian);
+            this.Padding = index < span.Length ? span.Slice(index).ToArray() : null;
         }
     }
 }

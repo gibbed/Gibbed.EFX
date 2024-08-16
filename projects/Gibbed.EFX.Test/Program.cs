@@ -22,7 +22,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using Gibbed.Buffers;
 using Gibbed.EFX.FileFormats;
 using Gibbed.Memory;
 using NDesk.Options;
@@ -96,6 +98,21 @@ namespace Gibbed.EFX.Test
                     Endian = Endian.Little,
                 };
                 effect.Deserialize(inputBytes);
+
+                PooledArrayBufferWriter<byte> writer = new();
+                effect.Serialize(writer);
+                var writtenSpan = writer.WrittenSpan;
+                if (writtenSpan.SequenceEqual(inputBytes) == false)
+                {
+                    Console.WriteLine($"mismatch: {inputPath}");
+
+                    if (Debugger.IsAttached == true)
+                    {
+                        File.WriteAllBytes("mismatch.bin", writtenSpan.ToArray());
+                        throw new InvalidOperationException();
+                    }
+                }
+                writer.Clear();
             }
         }
     }

@@ -22,33 +22,38 @@
 
 using System;
 using System.Buffers;
+using Gibbed.Buffers;
 using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats.Commands
 {
-    public class UnhandledCommand : ICommand
+    public abstract class BaseCommand : ICommand
     {
-        private CommandOpcode _CommandOpcode;
+        public abstract CommandOpcode Opcode { get; }
 
-        public UnhandledCommand(CommandOpcode opcode)
+        protected abstract int DataOffsetDelta { get; }
+
+        protected virtual bool GetDataOffset(Target target, out int dataOffset)
         {
-            this._CommandOpcode = opcode;
+            dataOffset = default;
+            return false;
         }
-
-        public CommandOpcode Opcode => this._CommandOpcode;
-        public int DataOffset { get; set; }
-        public byte[] Data { get; set; }
 
         public void Serialize(IBufferWriter<byte> writer, Target target, Endian endian, out int dataOffset)
         {
-            dataOffset = this.DataOffset;
-            writer.Write(this.Data);
+            PooledArrayBufferWriter<byte> commandWriter = new();
+            this.Serialize(commandWriter, target, endian);
+            var commandSpan = commandWriter.WrittenSpan;
+            writer.Write(commandSpan);
+            if (GetDataOffset(target, out dataOffset) == false)
+            {
+                dataOffset = commandSpan.Length - this.DataOffsetDelta;
+            }
+            commandWriter.Clear();
         }
 
-        public void Deserialize(ReadOnlySpan<byte> span, int dataOffset, Target target, Endian endian)
-        {
-            this.DataOffset = dataOffset;
-            this.Data = span.ToArray();
-        }
+        protected abstract void Serialize(IBufferWriter<byte> writer, Target target, Endian endian);
+
+        public abstract void Deserialize(ReadOnlySpan<byte> span, int dataOffset, Target target, Endian endian);
     }
 }

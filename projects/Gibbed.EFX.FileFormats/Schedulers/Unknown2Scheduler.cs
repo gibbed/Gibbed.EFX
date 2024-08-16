@@ -25,21 +25,21 @@ using System.Buffers;
 using System.Collections.Generic;
 using Gibbed.Memory;
 
-namespace Gibbed.EFX.FileFormats
+namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public class SchedulerUnknown2 : SchedulerBase
+    public class Unknown2Scheduler : BaseScheduler
     {
         public override SchedulerType Type => SchedulerType.Unknown2;
 
-        private readonly List<SchedulerUnknown2Sub> _Entries;
+        private readonly List<Unknown2Sub> _Entries;
 
-        public SchedulerUnknown2()
+        public Unknown2Scheduler()
         {
             this._Entries = new();
         }
 
         public byte EntryAllocatedCount { get; set; }
-        public List<SchedulerUnknown2Sub> Entries => this._Entries;
+        public List<Unknown2Sub> Entries => this._Entries;
 
         public override void Serialize(IBufferWriter<byte> writer, Target target, Endian endian)
         {
@@ -59,7 +59,7 @@ namespace Gibbed.EFX.FileFormats
             {
                 entry.Write(writer, target, endian);
             }
-            SchedulerUnknown2Sub.Skip(writer, target, this.Entries.Count, this.EntryAllocatedCount);
+            Unknown2Sub.Skip(writer, target, this.Entries.Count, this.EntryAllocatedCount);
         }
 
         public override void Deserialize(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
@@ -78,9 +78,9 @@ namespace Gibbed.EFX.FileFormats
             this._Entries.Clear();
             for (int i = 0; i < entryCount; i++)
             {
-                this._Entries.Add(SchedulerUnknown2Sub.Read(span, ref index, target, endian));
+                this._Entries.Add(Unknown2Sub.Read(span, ref index, target, endian));
             }
-            SchedulerUnknown2Sub.Skip(span, ref index, target, entryCount, entryAllocatedCount);
+            Unknown2Sub.Skip(span, ref index, target, entryCount, entryAllocatedCount);
         }
     }
 }

@@ -24,6 +24,7 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
+using Gibbed.Buffers;
 using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats
@@ -45,6 +46,7 @@ namespace Gibbed.EFX.FileFormats
         public void Serialize(IBufferWriter<byte> writer)
         {
             var endian = this.Endian;
+            var target = this.Target;
 
             string versionString = this.Target.Version switch
             {
@@ -58,8 +60,17 @@ namespace Gibbed.EFX.FileFormats
 
             writer.WriteValueF32(this.Unknown, endian);
 
-            // TODO(gibbed): finish me
-            throw new NotImplementedException();
+            PooledArrayBufferWriter<byte> chunkWriter = new();
+
+            WriteChunks(chunkWriter, target, endian, this.Commands);
+
+            var chunkSpan = chunkWriter.WrittenSpan;
+
+            writer.WriteValueS32(8 + 4 + 4 + chunkSpan.Length, endian);
+
+            writer.Write(chunkSpan);
+
+            chunkWriter.Clear();
         }
 
         public void Deserialize(ReadOnlySpan<byte> span)
@@ -95,7 +106,7 @@ namespace Gibbed.EFX.FileFormats
             Target target = new(game, version);
 
             List<ICommand> commands = new();
-            ReadCommands(dataSpan, target, endian, commands);
+            ReadChunks(dataSpan, target, endian, commands);
 
             this.Target = target;
             this.Unknown = unknown;
@@ -103,7 +114,7 @@ namespace Gibbed.EFX.FileFormats
             this.Commands.AddRange(commands);
         }
 
-        private static void ReadCommands(ReadOnlySpan<byte> span, Target target, Endian endian, List<ICommand> commands)
+        private static void ReadChunks(ReadOnlySpan<byte> span, Target target, Endian endian, List<ICommand> commands)
         {
             int index = 0;
             int spanLength = span.Length;
@@ -116,7 +127,7 @@ namespace Gibbed.EFX.FileFormats
                     throw new FormatException();
                 }
 
-                var chunkSpan = span.Slice(chunkStart, chunkSize);
+                var chunkSpan = span.Slice(chunkStart + 4, chunkSize - 4);
                 index = chunkStart + chunkSize;
 
                 commands.Add(ReadCommand(chunkSpan, target, endian));
@@ -125,7 +136,7 @@ namespace Gibbed.EFX.FileFormats
 
         private static ICommand ReadCommand(ReadOnlySpan<byte> span, Target target, Endian endian)
         {
-            int index = 4; // skip command size
+            int index = 0;
 
             var version = span.ReadValueU16(ref index, endian);
             if (version != 0x100)
@@ -134,27 +145,51 @@ namespace Gibbed.EFX.FileFormats
             }
 
             var opcode = (CommandOpcode)span.ReadValueU16(ref index, endian);
+            var dataOffset = span.ReadValueS32(ref index, endian);
 
-            var headerSize = opcode.GetHeaderSize();
-            var dataSize = span.ReadValueS32(ref index, endian);
+            var commandSpan = span.Slice(index);
+            index += commandSpan.Length;
 
-            var dataSpan = span.Slice(index, headerSize + dataSize);
-
-            var read = opcode.GetRead();
-
-            ICommand command;
-            if (read != null)
-            {
-                command = read(dataSpan, target, endian);
-            }
-            else
-            {
-                command = new Commands.UnhandledCommand(opcode)
-                {
-                    Data = dataSpan.ToArray(),
-                };
-            }
+            var command = CommandFactory.Create(opcode);
+            command.Deserialize(commandSpan, dataOffset, target, endian);
             return command;
+        }
+
+        private static void WriteChunks(IBufferWriter<byte> writer, Target target, Endian endian, List<ICommand> commands)
+        {
+            foreach (var command in commands)
+            {
+                PooledArrayBufferWriter<byte> chunkWriter = new();
+
+                WriteCommand(command, chunkWriter, target, endian);
+
+                var chunkSpan = chunkWriter.WrittenSpan;
+
+                var chunkSize = chunkSpan.Length + 4;
+                var paddingSize = chunkSize.Align(16) - chunkSize;
+
+                writer.WriteValueS32(chunkSize + paddingSize, endian);
+                writer.Write(chunkSpan);
+                writer.SkipPadding(paddingSize);
+
+                chunkWriter.Clear();
+            }
+        }
+
+        private static void WriteCommand(ICommand command, IBufferWriter<byte> writer, Target target, Endian endian)
+        {
+            PooledArrayBufferWriter<byte> commandWriter = new();
+
+            command.Serialize(commandWriter, target, endian, out int dataOffset);
+
+            var commandSpan = commandWriter.WrittenSpan;
+
+            writer.WriteValueU16(0x100, endian);
+            writer.WriteValueU16((ushort)command.Opcode, endian);
+            writer.WriteValueS32(dataOffset, endian);
+            writer.Write(commandSpan);
+
+            commandWriter.Clear();
         }
 
         private Game DetectGame(byte version, ReadOnlySpan<byte> span, Endian endian)

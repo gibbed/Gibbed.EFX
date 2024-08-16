@@ -21,29 +21,45 @@
  */
 
 using System;
+using System.Buffers;
 using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats.Commands
 {
-    public class ResourceAddCommand : ICommand
+    public class ResourceAddCommand : BaseCommand
     {
-        public CommandOpcode Opcode => CommandOpcode.ResourceAdd;
-
-        public ResourceAddCommand(ResourceKey key, byte[] data)
-        {
-            this.Key = key;
-            this.Data = data;
-        }
+        public override CommandOpcode Opcode => CommandOpcode.ResourceAdd;
+        protected override int DataOffsetDelta => 4;
 
         public ResourceKey Key { get; set; }
         public byte[] Data { get; set; }
 
-        public static ResourceAddCommand Read(ReadOnlySpan<byte> span, Target gameVersion,Endian endian)
+        protected override bool GetDataOffset(Target target, out int dataOffset)
+        {
+            if (this.Key.Type != ResourceType.Texture ||
+                target.Game != Game.TacticsOgreReborn)
+            {
+                dataOffset = default;
+                return false;
+            }
+
+            // workaround for when texture has trailing junk data
+            // header size + data size from the texture header, aligned to 16 bytes
+            dataOffset = (0x34 + BitConverter.ToInt32(this.Data, 0x10)).Align(16);
+            return true;
+        }
+
+        protected override void Serialize(IBufferWriter<byte> writer, Target target, Endian endian)
+        {
+            this.Key.Write(writer, endian);
+            writer.Write(this.Data);
+        }
+
+        public override void Deserialize(ReadOnlySpan<byte> span, int dataOffset, Target target, Endian endian)
         {
             int index = 0;
-            var key = ResourceKey.Read(span, ref index, endian);
-            var data = span.Slice(index).ToArray();
-            return new(key, data);
+            this.Key = ResourceKey.Read(span, ref index, endian);
+            this.Data = span.Slice(index).ToArray();
         }
     }
 }

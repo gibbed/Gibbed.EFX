@@ -20,10 +20,17 @@
  *    distribution.
  */
 
+using Gibbed.Memory;
+using System;
+using System.Buffers;
+
 namespace Gibbed.EFX.FileFormats
 {
     public interface ICommand
     {
         CommandOpcode Opcode { get; }
+
+        void Serialize(IBufferWriter<byte> writer, Target target, Endian endian, out int dataOffset);
+        void Deserialize(ReadOnlySpan<byte> span, int dataOffset, Target target, Endian endian);
     }
 }

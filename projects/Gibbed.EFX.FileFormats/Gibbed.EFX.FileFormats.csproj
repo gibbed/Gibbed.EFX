@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Company>Gibbed</Company>
     <Authors>Gibbed</Authors>
-    <Description>http://gib.me/</Description>
+    <Description>https://gib.me/</Description>
     <Copyright>Copyright © Gibbed 2024</Copyright>
   </PropertyGroup>
   <PropertyGroup>
@@ -10,6 +10,7 @@
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Gibbed.Buffers\Gibbed.Buffers.csproj" />
     <ProjectReference Include="..\Gibbed.Memory\Gibbed.Memory.csproj" />
   </ItemGroup>
 </Project>

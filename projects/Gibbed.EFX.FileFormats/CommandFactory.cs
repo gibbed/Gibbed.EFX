@@ -20,27 +20,17 @@
  *    distribution.
  */
 
-using System;
-using Gibbed.Memory;
 using Gibbed.EFX.FileFormats.Commands;
 
 namespace Gibbed.EFX.FileFormats
 {
-    internal static class CommandHelpers
+    internal static class CommandFactory
     {
-        public static int GetHeaderSize(this CommandOpcode opcode) => opcode switch
+        public static ICommand Create(this CommandOpcode opcode) => opcode switch
         {
-            CommandOpcode.SchedulerAdd => 4,
-            _ => 0, //throw new NotSupportedException(),
-        };
-
-        public delegate ICommand ReadCommandDelegate(ReadOnlySpan<byte> span, Target gameVersion, Endian endian);
-
-        public static ReadCommandDelegate GetRead(this CommandOpcode opcode) => opcode switch
-        {
-            CommandOpcode.ResourceAdd => ResourceAddCommand.Read,
-            CommandOpcode.SchedulerAdd => SchedulerAddCommand.Read,
-            _ => null,
+            CommandOpcode.ResourceAdd => new ResourceAddCommand(),
+            CommandOpcode.SchedulerAdd => new SchedulerAddCommand(),
+            _ => new UnhandledCommand(opcode),
         };
 
     }

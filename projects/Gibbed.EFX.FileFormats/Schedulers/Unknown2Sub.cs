@@ -24,9 +24,9 @@ using System;
 using System.Buffers;
 using Gibbed.Memory;
 
-namespace Gibbed.EFX.FileFormats
+namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public struct SchedulerUnknown2Sub
+    public struct Unknown2Sub
     {
         public byte Type;
         public byte[] Unknown;
@@ -36,17 +36,17 @@ namespace Gibbed.EFX.FileFormats
             return target.Version < 11 ? 16 : 20;
         }
 
-        public static SchedulerUnknown2Sub Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
+        public static Unknown2Sub Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
         {
             var actionSize = GetActionSize(target);
-            SchedulerUnknown2Sub instance;
+            Unknown2Sub instance;
             instance.Type = span.ReadValueU8(ref index);
             instance.Unknown = span.Slice(index, actionSize - 1).ToArray();
             index += actionSize - 1;
             return instance;
         }
 
-        public static void Write(SchedulerUnknown2Sub instance, IBufferWriter<byte> writer, Target target, Endian endian)
+        public static void Write(Unknown2Sub instance, IBufferWriter<byte> writer, Target target, Endian endian)
         {
             var actionSize = GetActionSize(target);
             if (instance.Unknown?.Length != actionSize - 1)

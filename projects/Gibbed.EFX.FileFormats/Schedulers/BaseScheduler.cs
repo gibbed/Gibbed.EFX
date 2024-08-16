@@ -24,9 +24,9 @@ using System;
 using System.Buffers;
 using Gibbed.Memory;
 
-namespace Gibbed.EFX.FileFormats
+namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public abstract class SchedulerBase
+    public abstract class BaseScheduler
     {
         public abstract SchedulerType Type { get; }
 

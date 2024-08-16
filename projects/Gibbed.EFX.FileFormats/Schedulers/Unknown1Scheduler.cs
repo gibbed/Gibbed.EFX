@@ -24,9 +24,9 @@ using System;
 using System.Buffers;
 using Gibbed.Memory;
 
-namespace Gibbed.EFX.FileFormats
+namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public class SchedulerUnknown1 : SchedulerBase
+    public class Unknown1Scheduler : BaseScheduler
     {
         public override SchedulerType Type => SchedulerType.Unknown1;
 

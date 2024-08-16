@@ -29,7 +29,8 @@ namespace Gibbed.EFX.FileFormats
     {
         public static void SkipPadding(this IBufferWriter<byte> writer, int size)
         {
-            writer.GetSpan(size);
+            var span = writer.GetSpan(size);
+            span.Clear();
             writer.Advance(size);
         }
 

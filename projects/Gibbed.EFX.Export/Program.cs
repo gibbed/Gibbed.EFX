@@ -26,6 +26,7 @@ using System.IO;
 using System.Text;
 using Gibbed.EFX.FileFormats;
 using Gibbed.EFX.FileFormats.Commands;
+using Gibbed.EFX.FileFormats.Schedulers;
 using Gibbed.Memory;
 using NDesk.Options;
 
@@ -142,6 +143,7 @@ namespace Gibbed.EFX.Export
                     CreatePath(outputPath);
                     File.WriteAllBytes(outputPath, unhandledCommand.Data);
 
+                    commandTable["data_offset"] = unhandledCommand.DataOffset;
                     commandTable["data_path"] = PathHelper.GetRelativePath(outputBasePath, outputPath) ?? throw new InvalidOperationException();
                 }
                 else
@@ -192,19 +194,19 @@ namespace Gibbed.EFX.Export
 
             schedulerTable["type"] = command.Scheduler.Type.ToString();
 
-            if (command.Scheduler is SchedulerUnknown0 scheduler0)
+            if (command.Scheduler is Unknown0Scheduler scheduler0)
             {
                 Export(scheduler0, schedulerTable);
             }
-            else if (command.Scheduler is SchedulerUnknown1 scheduler1)
+            else if (command.Scheduler is Unknown1Scheduler scheduler1)
             {
                 Export(scheduler1, schedulerTable);
             }
-            else if (command.Scheduler is SchedulerUnknown2 scheduler2)
+            else if (command.Scheduler is Unknown2Scheduler scheduler2)
             {
                 Export(scheduler2, schedulerTable);
             }
-            else if (command.Scheduler is SchedulerUnknown3 scheduler3)
+            else if (command.Scheduler is Unknown3Scheduler scheduler3)
             {
                 Export(scheduler3, schedulerTable);
             }
@@ -216,7 +218,7 @@ namespace Gibbed.EFX.Export
             table["scheduler"] = schedulerTable;
         }
 
-        private static void Export(SchedulerBase scheduler, Tommy.TomlTable table)
+        private static void Export(BaseScheduler scheduler, Tommy.TomlTable table)
         {
             table["u2"] = scheduler.Unknown2;
             table["u5"] = scheduler.Unknown5;
@@ -224,22 +226,22 @@ namespace Gibbed.EFX.Export
             table["timeline_end"] = scheduler.TimelineEnd;
         }
 
-        private static void Export(SchedulerUnknown0 scheduler, Tommy.TomlTable table)
+        private static void Export(Unknown0Scheduler scheduler, Tommy.TomlTable table)
         {
-            Export((SchedulerBase)scheduler, table);
+            Export((BaseScheduler)scheduler, table);
         }
 
-        private static void Export(SchedulerUnknown1 scheduler, Tommy.TomlTable table)
+        private static void Export(Unknown1Scheduler scheduler, Tommy.TomlTable table)
         {
-            Export((SchedulerBase)scheduler, table);
+            Export((BaseScheduler)scheduler, table);
             table["generator_id"] = scheduler.GeneratorId;
             table["element_id"] = scheduler.ElementId;
             table["u14"] = scheduler.Unknown14;
         }
 
-        private static void Export(SchedulerUnknown2 scheduler, Tommy.TomlTable table)
+        private static void Export(Unknown2Scheduler scheduler, Tommy.TomlTable table)
         {
-            Export((SchedulerBase)scheduler, table);
+            Export((BaseScheduler)scheduler, table);
 
             if (scheduler.EntryAllocatedCount != scheduler.Entries.Count)
             {
@@ -267,15 +269,15 @@ namespace Gibbed.EFX.Export
             }
         }
 
-        private static void Export(SchedulerUnknown2Sub action, Tommy.TomlTable table)
+        private static void Export(Unknown2Sub action, Tommy.TomlTable table)
         {
             table["type"] = action.Type;
             table["u1"] = BitConverter.ToString(action.Unknown).ToUpperInvariant().Replace("-", " ");
         }
 
-        private static void Export(SchedulerUnknown3 scheduler, Tommy.TomlTable table)
+        private static void Export(Unknown3Scheduler scheduler, Tommy.TomlTable table)
         {
-            Export((SchedulerBase)scheduler, table);
+            Export((BaseScheduler)scheduler, table);
             table["u10"] = scheduler.Unknown10;
             table["u11"] = scheduler.Unknown11;
             table["attach_id"] = scheduler.AttachId;

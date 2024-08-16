@@ -1,15 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <PropertyGroup>
     <Company>Gibbed</Company>
     <Authors>Gibbed</Authors>
     <Description>https://gib.me/</Description>
     <Copyright>Copyright © Gibbed 2024</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(GibbedBuffers_TargetFrameworksToBuild)' == '' ">
     <GibbedBuffers_TargetFrameworksToBuild>$(TargetFrameworksToBuild)</GibbedBuffers_TargetFrameworksToBuild>

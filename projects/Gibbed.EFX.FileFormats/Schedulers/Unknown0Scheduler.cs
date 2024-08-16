@@ -20,9 +20,9 @@
  *    distribution.
  */
 
-namespace Gibbed.EFX.FileFormats
+namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public class SchedulerUnknown0 : SchedulerBase
+    public class Unknown0Scheduler : BaseScheduler
     {
         public override SchedulerType Type => SchedulerType.Unknown0;
     }

@@ -24,9 +24,9 @@ using System;
 using System.Buffers;
 using Gibbed.Memory;
 
-namespace Gibbed.EFX.FileFormats
+namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public class SchedulerUnknown3 : SchedulerBase
+    public class Unknown3Scheduler : BaseScheduler
     {
         public override SchedulerType Type => SchedulerType.Unknown3;
 
@@ -56,7 +56,7 @@ namespace Gibbed.EFX.FileFormats
                 throw new ArgumentOutOfRangeException(nameof(target), "unsupported target");
             }
             base.Deserialize(span, ref index, target, endian);
-            this.Unknown10 = span.ReadValueU8(ref index);
+            this.Unknown10 = span.ReadValueU8(ref index); // used to fetch a resource type Unknown58; related to Unknown1C
             this.Unknown11 = span.ReadValueU8(ref index);
             this.AttachId = span.ReadValueU16(ref index, endian);
             span.SkipPadding(ref index, 8);
