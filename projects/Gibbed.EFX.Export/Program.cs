@@ -216,6 +216,11 @@ namespace Gibbed.EFX.Export
             }
 
             table["scheduler"] = schedulerTable;
+
+            if (command.Padding?.Length > 0)
+            {
+                table["padding"] = BitConverter.ToString(command.Padding).ToUpperInvariant().Replace("-", " ");
+            }
         }
 
         private static void Export(BaseScheduler scheduler, Tommy.TomlTable table)
