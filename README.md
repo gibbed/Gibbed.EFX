@@ -34,6 +34,7 @@ Intended to work with all available regional versions of the game, though only t
 # Tools
 
 * [`Export`](projects/Gibbed.EFX.Export): Exporter for `.EFX` files.
+* [`Import`](projects/Gibbed.EFX.Import): Importer for `.EFX` files.
 
 # TODO
 
