@@ -26,16 +26,15 @@ namespace Gibbed.EFX.FileFormats
     {
         Invalid = 0,
 
-        Unknown50 = 0x50,
-        Unknown51 = 0x51,
-        Texture = 0x52,
-        Unknown53 = 0x53,
-        Unknown54 = 0x54,
-
-        Unknown56 = 0x56,
-
-        Unknown58 = 0x58,
-
-        Sound = 0x57,
+        Unknown50 = 0x50, // [PRF]
+        Unknown51 = 0x51, // [PRF]
+        Texture = 0x52, // [PRF]
+        Unknown53 = 0x53, // [PRF]
+        Unknown54 = 0x54, // [PRF]
+        Unknown55 = 0x55, // [F]
+        Unknown56 = 0x56, // [F]
+        Sound = 0x57, // [PRF]
+        Unknown58 = 0x58, // [F]
+        Unknown59 = 0x59, // [F]
     }
 }

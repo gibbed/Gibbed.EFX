@@ -33,42 +33,42 @@ namespace Gibbed.EFX.FileFormats
         [Obsolete] TexView = 0x402, // EFFCMD_TEXVIEW
         [Obsolete] ScreenData = 0x403, // EFFCMD_SCREENDATA
 
-        SchedulerManagerReset = 0x500, // [PR] EFFCMD_SCHEDULERMANAGER
-        AttachManagerReset = 0x510, // [PR] EFFCMD_ATTACHMANAGER
-        GeneratorManagerReset = 0x520, // [PR] EFFCMD_GENERATORMANAGER
-        ElementManagerReset = 0x530, // [PR] EFFCMD_ELEMENTMANAGER
+        SchedulerManagerReset = 0x500, // [PRF] EFFCMD_SCHEDULERMANAGER
+        AttachManagerReset = 0x510, // [PRF] EFFCMD_ATTACHMANAGER
+        GeneratorManagerReset = 0x520, // [PRF] EFFCMD_GENERATORMANAGER
+        ElementManagerReset = 0x530, // [PRF] EFFCMD_ELEMENTMANAGER
         
-        ResourceDelete = 0x540, // [PR] EFFCMD_RESOURCEMANAGER
+        ResourceDelete = 0x540, // [PRF] EFFCMD_RESOURCEMANAGER
 
-        SchedulerMetaAdd = 0x600, // [PR] EFFCMD_SCHEMETA
-        SchedulerMetaDelete = 0x601, // [PR] EFFCMD_SCHEMETADELETE
+        SchedulerMetaAdd = 0x600, // [PRF] EFFCMD_SCHEMETA
+        SchedulerMetaDelete = 0x601, // [PRF] EFFCMD_SCHEMETADELETE
 
-        SchedulerPageAdd = 0x610, // [PR] EFFCMD_SCHEPAGE
-        SchedulerPageDelete = 0x611, // [PR] EFFCMD_SCHEPAGEDELETE
+        SchedulerPageAdd = 0x610, // [PRF] EFFCMD_SCHEPAGE
+        SchedulerPageDelete = 0x611, // [PRF] EFFCMD_SCHEPAGEDELETE
 
-        SchedulerAdd = 0x620, // [PR] EFFCMD_SCHEDULER
+        SchedulerAdd = 0x620, // [PRF] EFFCMD_SCHEDULER
 
-        AttachAdd = 0x700, // [PR] EFFCMD_ATTACH
+        AttachAdd = 0x700, // [PRF] EFFCMD_ATTACH
 
-        GeneratorAdd = 0x800, // [PR] EFFCMD_GENERATOR
+        GeneratorAdd = 0x800, // [PRF] EFFCMD_GENERATOR
 
-        GeneratorMemoryReset = 0x900, // [PR] EFFCMD_GENRAM
+        GeneratorMemoryReset = 0x900, // [PRF] EFFCMD_GENRAM
 
-        ElementAdd = 0xA00, // [PR] EFFCMD_ELEMENT
+        ElementAdd = 0xA00, // [PRF] EFFCMD_ELEMENT
 
-        ResourceAdd = 0xB00, // [PR] EFFCMD_RESOURCE
+        ResourceAdd = 0xB00, // [PRF] EFFCMD_RESOURCE
 
-        EffectCyanSystem = 0x1000, // [PR] EFFCMD_EFFECCYANSYSYTEM
+        EffectCyanSystem = 0x1000, // [PRF] EFFCMD_EFFECCYANSYSYTEM
 
         [Obsolete] CharacterData = 0x1001, // EFFCMD_CHARADATA
         [Obsolete] First3DPosition = 0x1002, // EFFCMD_FIRST3DPOS
         [Obsolete] ObjectBoneId = 0x1003, // EFFCMD_OBJBONEID
 
-        [Obsolete] Zeek3System = 0x2000, // EFFCMD_ZEEK3SYSTEM
+        [Obsolete] Zeek3System = 0x2000, // [F] EFFCMD_ZEEK3SYSTEM
 
-        [Obsolete] Matrix3System = 0x3000, // EFFCMD_MAT3SYSTEM
+        [Obsolete] Matrix3System = 0x3000, // [F] EFFCMD_MAT3SYSTEM
 
-        [Obsolete] ArrangeSystem = 0x4000, // EFFCMD_ARRANGESYSTEM
+        [Obsolete] ArrangeSystem = 0x4000, // [F] EFFCMD_ARRANGESYSTEM
 
         [Obsolete] KHExtension1 = 0x5000, // EFFCMD_KHEXTENSION1
     }
