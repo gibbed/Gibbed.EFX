@@ -102,7 +102,7 @@ namespace Gibbed.EFX.Export
             {
                 table.IsInline = false;
 
-                Tommy.TomlArray actionsArray = new()
+                Tommy.TomlArray entriesArray = new()
                 {
                     //IsTableArray = true,
                     IsMultiline = true,
@@ -110,19 +110,20 @@ namespace Gibbed.EFX.Export
 
                 foreach (var entry in scheduler.Entries)
                 {
-                    Tommy.TomlTable actionTable = new();
-                    Export(entry, actionTable);
-                    actionsArray.Add(actionTable);
+                    Tommy.TomlTable entryTable = new();
+                    Export(entry, entryTable);
+                    entriesArray.Add(entryTable);
                 }
 
-                table["actions"] = actionsArray;
+                table["entries"] = entriesArray;
             }
         }
 
-        private static void Export(Unknown2Sub action, Tommy.TomlTable table)
+        private static void Export(Unknown2Entry entry, Tommy.TomlTable table)
         {
-            table["type"] = action.Type;
-            table["u1"] = Export(action.Unknown);
+            table["type"] = entry.Type;
+            table["timeline_start"] = entry.TimelineStart;
+            table["payload"] = Export(entry.Payload);
         }
 
         private static void Export(Unknown3Scheduler scheduler, Tommy.TomlTable table)

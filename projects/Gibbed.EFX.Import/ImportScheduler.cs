@@ -95,9 +95,9 @@ namespace Gibbed.EFX.Import
                 return false;
             }
 
-            foreach (Tommy.TomlTable actionTable in table["actions"])
+            foreach (Tommy.TomlTable entryTable in table["entries"])
             {
-                if (ImportUnknown2SchedulerEntry(actionTable, out var entry) == false)
+                if (ImportUnknown2Entry(entryTable, out var entry) == false)
                 {
                     return false;
                 }
@@ -112,16 +112,17 @@ namespace Gibbed.EFX.Import
             return true;
         }
 
-        private static bool ImportUnknown2SchedulerEntry(Tommy.TomlTable table, out Unknown2Sub entry)
+        private static bool ImportUnknown2Entry(Tommy.TomlTable table, out Unknown2Entry entry)
         {
             entry = default;
             entry.Type = (byte)table["type"].AsInteger.Value;
-            if (ImportBytes(table["u1"], out var unknown) == false)
+            entry.TimelineStart = (ushort)table["timeline_start"].AsInteger.Value;
+            if (ImportBytes(table["payload"], out var payload) == false)
             {
-                Console.WriteLine($"Invalid byte table for {nameof(Unknown2Sub)}.{nameof(Unknown2Sub.Unknown)}.");
+                Console.WriteLine($"Invalid byte table for {nameof(Unknown2Entry)}.{nameof(Unknown2Entry.Payload)}.");
                 return false;
             }
-            entry.Unknown = unknown;
+            entry.Payload = payload;
             return true;
         }
 

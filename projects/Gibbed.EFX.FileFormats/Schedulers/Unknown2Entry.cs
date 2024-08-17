@@ -26,35 +26,40 @@ using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats.Schedulers
 {
-    public struct Unknown2Sub
+    public struct Unknown2Entry
     {
         public byte Type;
-        public byte[] Unknown;
+        public ushort TimelineStart;
+        public byte[] Payload;
 
-        private static int GetActionSize(Target target)
+        private static int GetPayloadSize(Target target)
         {
-            return target.Version < 11 ? 16 : 20;
+            return target.Version < 11 ? 12 : 16;
         }
 
-        public static Unknown2Sub Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
+        public static Unknown2Entry Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
         {
-            var actionSize = GetActionSize(target);
-            Unknown2Sub instance;
+            var payloadSize = GetPayloadSize(target);
+            Unknown2Entry instance;
             instance.Type = span.ReadValueU8(ref index);
-            instance.Unknown = span.Slice(index, actionSize - 1).ToArray();
-            index += actionSize - 1;
+            span.SkipPadding(ref index, 1);
+            instance.TimelineStart = span.ReadValueU16(ref index, endian);
+            instance.Payload = span.Slice(index, payloadSize).ToArray();
+            index += payloadSize;
             return instance;
         }
 
-        public static void Write(Unknown2Sub instance, IBufferWriter<byte> writer, Target target, Endian endian)
+        public static void Write(Unknown2Entry instance, IBufferWriter<byte> writer, Target target, Endian endian)
         {
-            var actionSize = GetActionSize(target);
-            if (instance.Unknown?.Length != actionSize - 1)
+            var payloadSize = GetPayloadSize(target);
+            if (instance.Payload?.Length != payloadSize)
             {
-                throw new InvalidOperationException($"{nameof(Unknown)} is not {actionSize - 1} bytes");
+                throw new InvalidOperationException($"{nameof(Payload)} is not {payloadSize} bytes");
             }
             writer.WriteValueU8(instance.Type);
-            writer.WriteBytes(instance.Unknown);
+            writer.SkipPadding(1);
+            writer.WriteValueU16(instance.TimelineStart, endian);
+            writer.WriteBytes(instance.Payload);
         }
 
         public void Write(IBufferWriter<byte> writer, Target target, Endian endian)
@@ -64,16 +69,18 @@ namespace Gibbed.EFX.FileFormats.Schedulers
 
         internal static void Skip(ReadOnlySpan<byte> span, ref int index, Target target, int count, int allocatedCount)
         {
-            var actionSize = GetActionSize(target);
-            var extraSize = (allocatedCount - count) * actionSize;
-            span.SkipPadding(ref index, extraSize);
+            var payloadSize = GetPayloadSize(target);
+            var entrySize = 1 + 1 + payloadSize;
+            var totalSize = (allocatedCount - count) * entrySize;
+            span.SkipPadding(ref index, totalSize);
         }
 
         internal static void Skip(IBufferWriter<byte> writer, Target target, int count, int allocatedCount)
         {
-            var actionSize = GetActionSize(target);
-            var extraSize = (allocatedCount - count) * actionSize;
-            writer.SkipPadding(extraSize);
+            var payloadSize = GetPayloadSize(target);
+            var entrySize = 1 + 1 + payloadSize;
+            var totalSize = (allocatedCount - count) * entrySize;
+            writer.SkipPadding(totalSize);
         }
     }
 }
