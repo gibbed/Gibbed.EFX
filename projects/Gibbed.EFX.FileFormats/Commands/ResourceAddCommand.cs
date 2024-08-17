@@ -22,6 +22,7 @@
 
 using System;
 using System.Buffers;
+using Gibbed.EFX.FileFormats.Resources;
 using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats.Commands
@@ -32,7 +33,8 @@ namespace Gibbed.EFX.FileFormats.Commands
         protected override int DataOffsetDelta => 4;
 
         public ResourceKey Key { get; set; }
-        public byte[] Data { get; set; }
+        public BaseResource Resource { get; set; }
+        public byte[] Padding { get; set; }
 
         protected override bool GetDataOffset(Target target, out int dataOffset)
         {
@@ -43,23 +45,28 @@ namespace Gibbed.EFX.FileFormats.Commands
                 return false;
             }
 
+            var resource = (UnhandledResource)this.Resource;
+
             // workaround for when texture has trailing junk data
             // header size + data size from the texture header, aligned to 16 bytes
-            dataOffset = (0x34 + BitConverter.ToInt32(this.Data, 0x10)).Align(16);
+            dataOffset = (0x34 + BitConverter.ToInt32(resource.Data, 0x10)).Align(16);
             return true;
         }
 
         protected override void Serialize(IBufferWriter<byte> writer, Target target, Endian endian)
         {
             this.Key.Write(writer, endian);
-            writer.Write(this.Data);
+            this.Resource.Serialize(writer, target, endian);
+            writer.Write(this.Padding);
         }
 
         public override void Deserialize(ReadOnlySpan<byte> span, int dataOffset, Target target, Endian endian)
         {
             int index = 0;
-            this.Key = ResourceKey.Read(span, ref index, endian);
-            this.Data = span.Slice(index).ToArray();
+            var key = this.Key = ResourceKey.Read(span, ref index, endian);
+            var resource = this.Resource = ResourceFactory.Create(key.Type);
+            resource.Deserialize(span, ref index, target, endian);
+            this.Padding = span.Slice(index).ToArray();
         }
     }
 }

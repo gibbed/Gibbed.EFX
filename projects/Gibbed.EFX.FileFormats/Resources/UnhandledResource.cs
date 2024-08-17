@@ -20,21 +20,35 @@
  *    distribution.
  */
 
-namespace Gibbed.EFX.FileFormats
-{
-    public enum ResourceType : byte
-    {
-        Invalid = 0,
+using System;
+using System.Buffers;
+using Gibbed.Memory;
 
-        Unknown50 = 0x50, // [PRF]
-        Unknown51 = 0x51, // [PRF]
-        Texture = 0x52, // [PRF]
-        Unknown53 = 0x53, // [PRF]
-        Model = 0x54, // [PRF]
-        Unknown55 = 0x55, // [F]
-        Unknown56 = 0x56, // [F]
-        Sound = 0x57, // [PRF]
-        Unknown58 = 0x58, // [F]
-        Unknown59 = 0x59, // [F]
+namespace Gibbed.EFX.FileFormats.Resources
+{
+    public class UnhandledResource : BaseResource
+    {
+        private readonly ResourceType _Type;
+
+        public UnhandledResource(ResourceType type)
+        {
+            this._Type = type;
+        }
+
+        public byte[] Data { get; set; }
+
+        public override ResourceType Type => this._Type;
+
+        public override void Serialize(IBufferWriter<byte> writer, Target target, Endian endian)
+        {
+            writer.Write(this.Data);
+        }
+
+        public override void Deserialize(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
+        {
+            var dataSpan = span.Slice(index);
+            this.Data = dataSpan.ToArray();
+            index += dataSpan.Length;
+        }
     }
 }

@@ -20,21 +20,32 @@
  *    distribution.
  */
 
-namespace Gibbed.EFX.FileFormats
-{
-    public enum ResourceType : byte
-    {
-        Invalid = 0,
+using System;
+using System.Buffers;
+using Gibbed.Memory;
 
-        Unknown50 = 0x50, // [PRF]
-        Unknown51 = 0x51, // [PRF]
-        Texture = 0x52, // [PRF]
-        Unknown53 = 0x53, // [PRF]
-        Model = 0x54, // [PRF]
-        Unknown55 = 0x55, // [F]
-        Unknown56 = 0x56, // [F]
-        Sound = 0x57, // [PRF]
-        Unknown58 = 0x58, // [F]
-        Unknown59 = 0x59, // [F]
+namespace Gibbed.EFX.FileFormats.Resources
+{
+    public struct ModelUnknown
+    {
+        public byte[] Unknown;
+
+        public static ModelUnknown Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
+        {
+            ModelUnknown instance;
+            instance.Unknown = span.Slice(index, 20).ToArray();
+            index += 20;
+            return instance;
+        }
+
+        public static void Write(ModelUnknown instance, IBufferWriter<byte> writer, Target target, Endian endian)
+        {
+            writer.WriteBytes(instance.Unknown, 0, 20);
+        }
+
+        public void Write(IBufferWriter<byte> writer, Target target, Endian endian)
+        {
+            Write(this, writer, target, endian);
+        }
     }
 }

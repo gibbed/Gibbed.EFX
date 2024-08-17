@@ -20,21 +20,18 @@
  *    distribution.
  */
 
+using Gibbed.EFX.FileFormats.Resources;
+
 namespace Gibbed.EFX.FileFormats
 {
-    public enum ResourceType : byte
+    public static class ResourceFactory
     {
-        Invalid = 0,
+        public static BaseResource Create(this ResourceType type) => type switch
+        {
+            ResourceType.Unknown50 => new Unknown50Resource(),
+            ResourceType.Model => new ModelResource(),
+            _ => new UnhandledResource(type),
+        };
 
-        Unknown50 = 0x50, // [PRF]
-        Unknown51 = 0x51, // [PRF]
-        Texture = 0x52, // [PRF]
-        Unknown53 = 0x53, // [PRF]
-        Model = 0x54, // [PRF]
-        Unknown55 = 0x55, // [F]
-        Unknown56 = 0x56, // [F]
-        Sound = 0x57, // [PRF]
-        Unknown58 = 0x58, // [F]
-        Unknown59 = 0x59, // [F]
     }
 }

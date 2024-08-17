@@ -20,21 +20,39 @@
  *    distribution.
  */
 
+using System;
+using System.Buffers;
+using Gibbed.Memory;
+
 namespace Gibbed.EFX.FileFormats
 {
-    public enum ResourceType : byte
+    public struct UV
     {
-        Invalid = 0,
+        public float U;
+        public float V;
 
-        Unknown50 = 0x50, // [PRF]
-        Unknown51 = 0x51, // [PRF]
-        Texture = 0x52, // [PRF]
-        Unknown53 = 0x53, // [PRF]
-        Model = 0x54, // [PRF]
-        Unknown55 = 0x55, // [F]
-        Unknown56 = 0x56, // [F]
-        Sound = 0x57, // [PRF]
-        Unknown58 = 0x58, // [F]
-        Unknown59 = 0x59, // [F]
+        public static UV Read(ReadOnlySpan<byte> span, ref int index, Endian endian)
+        {
+            UV instance;
+            instance.U = span.ReadValueF32(ref index, endian);
+            instance.V = span.ReadValueF32(ref index, endian);
+            return instance;
+        }
+
+        public static void Write(UV instance, IBufferWriter<byte> writer, Endian endian)
+        {
+            writer.WriteValueF32(instance.U, endian);
+            writer.WriteValueF32(instance.V, endian);
+        }
+
+        public void Write(IBufferWriter<byte> writer, Endian endian)
+        {
+            Write(this, writer, endian);
+        }
+
+        public override string ToString()
+        {
+            return $"({this.U}, {this.V})";
+        }
     }
 }
