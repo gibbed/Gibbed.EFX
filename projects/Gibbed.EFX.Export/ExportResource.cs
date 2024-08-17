@@ -127,6 +127,22 @@ namespace Gibbed.EFX.Export
             }
         }
 
+        private static void Export(Unknown50ResourceEntry entry, Tommy.TomlTable table)
+        {
+            table["u00"] = Export(entry.Unknown00);
+            table["u10"] = Export(entry.Unknown10);
+            table["u20"] = Export(entry.Unknown20);
+            table["u30"] = Export(entry.Unknown30);
+            table["u40"] = Export(entry.Unknown40);
+            table["u50"] = Export(entry.Unknown50);
+            table["u60"] = Export(entry.Unknown60);
+            table["u64"] = Export(entry.Unknown64);
+            if (entry.Unknown70 != null)
+            {
+                table["u70"] = Export(entry.Unknown70);
+            }
+        }
+
         private static void Export(ModelResource resource, Tommy.TomlTable table)
         {
             table["flags"] = resource.Flags;
@@ -252,22 +268,6 @@ namespace Gibbed.EFX.Export
                 }
 
                 table["texture_ids"] = idsArray;
-            }
-        }
-
-        private static void Export(Unknown50ResourceEntry entry, Tommy.TomlTable table)
-        {
-            table["u00"] = Export(entry.Unknown00);
-            table["u10"] = Export(entry.Unknown10);
-            table["u20"] = Export(entry.Unknown20);
-            table["u30"] = Export(entry.Unknown30);
-            table["u40"] = Export(entry.Unknown40);
-            table["u50"] = Export(entry.Unknown50);
-            table["u60"] = Export(entry.Unknown60);
-            table["u64"] = Export(entry.Unknown64);
-            if (entry.Unknown70 != null)
-            {
-                table["u70"] = Export(entry.Unknown70);
             }
         }
     }
