@@ -26,13 +26,12 @@ using System.IO;
 using System.Text;
 using Gibbed.EFX.FileFormats;
 using Gibbed.EFX.FileFormats.Commands;
-using Gibbed.EFX.FileFormats.Schedulers;
 using Gibbed.Memory;
 using NDesk.Options;
 
 namespace Gibbed.EFX.Export
 {
-    internal class Program
+    internal partial class Program
     {
         private static string GetExecutableName()
         {
@@ -123,14 +122,7 @@ namespace Gibbed.EFX.Export
 
                 if (command is ResourceAddCommand resourceAddCommand)
                 {
-                    var key = resourceAddCommand.Key;
-                    var outputName = $"cmd_{i}_{opcode}_{key.Type}_{key.Unknown}_{key.Id}.bin";
-                    var outputPath = Path.Combine(outputBasePath, outputName);
-                    CreatePath(outputPath);
-                    File.WriteAllBytes(outputPath, resourceAddCommand.Data);
-
-                    commandTable["key"] = Export(resourceAddCommand.Key);
-                    commandTable["data_path"] = PathHelper.GetRelativePath(outputBasePath, outputPath) ?? throw new InvalidOperationException();
+                    Export(resourceAddCommand, i, commandTable, outputBasePath);
                 }
                 else if (command is SchedulerAddCommand schedulerAddCommand)
                 {
@@ -176,138 +168,6 @@ namespace Gibbed.EFX.Export
             var commandsOutputPath = Path.Combine(outputBasePath, "@efx.toml");
             CreatePath(commandsOutputPath);
             File.WriteAllText(commandsOutputPath, sb.ToString(), Encoding.UTF8);
-        }
-
-        private static Tommy.TomlTable Export(ResourceKey key)
-        {
-            Tommy.TomlTable table = new();
-            table.IsInline = true;
-            table["unknown"] = key.Unknown;
-            table["type"] = key.Type.ToString();
-            table["id"] = key.Id;
-            return table;
-        }
-
-        private static void Export(SchedulerAddCommand command, Tommy.TomlTable table)
-        {
-            table["meta_id"] = command.MetaId;
-            table["page_id"] = command.PageId;
-            table["scheduler_id"] = command.SchedulerId;
-
-            Tommy.TomlTable schedulerTable = new();
-            schedulerTable.IsInline = true;
-
-            schedulerTable["type"] = command.Scheduler.Type.ToString();
-
-            if (command.Scheduler is Unknown0Scheduler scheduler0)
-            {
-                Export(scheduler0, schedulerTable);
-            }
-            else if (command.Scheduler is Unknown1Scheduler scheduler1)
-            {
-                Export(scheduler1, schedulerTable);
-            }
-            else if (command.Scheduler is Unknown2Scheduler scheduler2)
-            {
-                Export(scheduler2, schedulerTable);
-            }
-            else if (command.Scheduler is Unknown3Scheduler scheduler3)
-            {
-                Export(scheduler3, schedulerTable);
-            }
-            else
-            {
-                throw new NotSupportedException();
-            }
-
-            table["scheduler"] = schedulerTable;
-
-            if (command.Padding?.Length > 0)
-            {
-                table["padding"] = Export(command.Padding);
-            }
-        }
-
-        private static void Export(BaseScheduler scheduler, Tommy.TomlTable table)
-        {
-            table["u2"] = scheduler.Unknown2;
-            table["u5"] = scheduler.Unknown5;
-            table["timeline_start"] = scheduler.TimelineStart;
-            table["timeline_end"] = scheduler.TimelineEnd;
-        }
-
-        private static void Export(Unknown0Scheduler scheduler, Tommy.TomlTable table)
-        {
-            Export((BaseScheduler)scheduler, table);
-        }
-
-        private static void Export(Unknown1Scheduler scheduler, Tommy.TomlTable table)
-        {
-            Export((BaseScheduler)scheduler, table);
-            table["generator_id"] = scheduler.GeneratorId;
-            table["element_id"] = scheduler.ElementId;
-            table["u14"] = scheduler.Unknown14;
-        }
-
-        private static void Export(Unknown2Scheduler scheduler, Tommy.TomlTable table)
-        {
-            Export((BaseScheduler)scheduler, table);
-
-            if (scheduler.EntryAllocatedCount != scheduler.Entries.Count)
-            {
-                table["entry_allocated_count"] = scheduler.EntryAllocatedCount;
-            }
-
-            if (scheduler.Entries.Count > 0)
-            {
-                table.IsInline = false;
-
-                Tommy.TomlArray actionsArray = new()
-                {
-                    //IsTableArray = true,
-                    IsMultiline = true,
-                };
-
-                foreach (var entry in scheduler.Entries)
-                {
-                    Tommy.TomlTable actionTable = new();
-                    Export(entry, actionTable);
-                    actionsArray.Add(actionTable);
-                }
-
-                table["actions"] = actionsArray;
-            }
-        }
-
-        private static void Export(Unknown2Sub action, Tommy.TomlTable table)
-        {
-            table["type"] = action.Type;
-            table["u1"] = Export(action.Unknown);
-        }
-
-        private static void Export(Unknown3Scheduler scheduler, Tommy.TomlTable table)
-        {
-            Export((BaseScheduler)scheduler, table);
-            table["u10"] = scheduler.Unknown10;
-            table["u11"] = scheduler.Unknown11;
-            table["attach_id"] = scheduler.AttachId;
-            table["u1C"] = scheduler.Unknown1C;
-        }
-
-        private static Tommy.TomlNode Export(byte[] bytes)
-        {
-            Tommy.TomlArray array = new();
-            foreach (var value in bytes)
-            {
-                array.Add(new Tommy.TomlInteger()
-                {
-                    IntegerBase = value != 0
-                        ? Tommy.TomlInteger.Base.Hexadecimal
-                        : Tommy.TomlInteger.Base.Decimal,
-                    Value = value,
-                });
-            }
-            return array;
         }
 
         private static void CreatePath(string path)
