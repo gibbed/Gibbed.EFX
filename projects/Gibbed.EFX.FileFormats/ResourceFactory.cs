@@ -29,6 +29,7 @@ namespace Gibbed.EFX.FileFormats
         public static BaseResource Create(this ResourceType type) => type switch
         {
             ResourceType.Unknown50 => new Unknown50Resource(),
+            ResourceType.Unknown51 => new Unknown51Resource(),
             ResourceType.Model => new ModelResource(),
             _ => new UnhandledResource(type),
         };

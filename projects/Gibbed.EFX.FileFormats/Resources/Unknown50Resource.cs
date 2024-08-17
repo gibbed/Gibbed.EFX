@@ -31,7 +31,7 @@ namespace Gibbed.EFX.FileFormats.Resources
     {
         public override ResourceType Type => ResourceType.Unknown50;
 
-        private readonly List<Unknown50ResourceEntry> _Entries;
+        private readonly List<Unknown50Entry> _Entries;
         private readonly List<byte> _TextureIds;
         private readonly List<byte> _Resource53Ids;
 
@@ -43,7 +43,7 @@ namespace Gibbed.EFX.FileFormats.Resources
         }
 
         public int Unknown04 { get; set; }
-        public List<Unknown50ResourceEntry> Entries => this._Entries;
+        public List<Unknown50Entry> Entries => this._Entries;
         public List<byte> TextureIds => this._TextureIds;
         public List<byte> Resource53Ids => this._Resource53Ids;
 
@@ -95,7 +95,7 @@ namespace Gibbed.EFX.FileFormats.Resources
             this._Entries.Clear();
             for (int i = 0; i < entryCount; i++)
             {
-                this._Entries.Add(Unknown50ResourceEntry.Read(span, ref index, target, endian));
+                this._Entries.Add(Unknown50Entry.Read(span, ref index, target, endian));
             }
 
             this._TextureIds.Clear();

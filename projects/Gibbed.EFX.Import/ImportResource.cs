@@ -33,6 +33,10 @@ namespace Gibbed.EFX.Import
             {
                 return ImportResource(table, unknown50Resource);
             }
+            else if(resource is Unknown51Resource unknown51Resource)
+            {
+                return ImportResource(table, unknown51Resource);
+            }
             else if (resource is ModelResource modelResource)
             {
                 return ImportResource(table, modelResource);
@@ -46,7 +50,7 @@ namespace Gibbed.EFX.Import
 
             foreach (Tommy.TomlTable entryTable in table["entries"])
             {
-                if (ImportUnknown50ResourceEntry(entryTable, out var entry) == false)
+                if (ImportUnknown50Entry(entryTable, out var entry) == false)
                 {
                     return false;
                 }
@@ -66,7 +70,7 @@ namespace Gibbed.EFX.Import
             return true;
         }
 
-        private static bool ImportUnknown50ResourceEntry(Tommy.TomlTable table, out Unknown50ResourceEntry entry)
+        private static bool ImportUnknown50Entry(Tommy.TomlTable table, out Unknown50Entry entry)
         {
             entry = default;
 
@@ -112,17 +116,53 @@ namespace Gibbed.EFX.Import
             }
             entry.Unknown60 = unknown60;
 
-            if (ImportBytes(table["u64"], out var unknown64Bytes) == false)
+            if (ImportBytes(table["u64"], out var unknown64) == false)
             {
                 return false;
             }
-            entry.Unknown64 = unknown64Bytes;
+            entry.Unknown64 = unknown64;
 
             if (ImportBytes(table["u70"], out var unknown70) == false)
             {
                 return false;
             }
             entry.Unknown70 = unknown70;
+
+            return true;
+        }
+
+        private static bool ImportResource(Tommy.TomlTable table, Unknown51Resource resource)
+        {
+            foreach (Tommy.TomlTable entryTable in table["entries"])
+            {
+                if (ImportUnknown51Entry(entryTable, out var entry) == false)
+                {
+                    return false;
+                }
+                resource.Entries.Add(entry);
+            }
+
+            return true;
+        }
+
+        private static bool ImportUnknown51Entry(Tommy.TomlTable table, out Unknown51Entry entry)
+        {
+            entry = default;
+
+            if (ImportBytes(table["u00"], out var unknown00) == false)
+            {
+                return false;
+            }
+            entry.Unknown00 = unknown00;
+
+            entry.Unknown08 = (byte)table["u08"].AsInteger.Value;
+            entry.Unknown09 = (byte)table["u09"].AsInteger.Value;
+
+            if (ImportBytes(table["u0A"], out var unknown0A) == false)
+            {
+                return false;
+            }
+            entry.Unknown0A = unknown0A;
 
             return true;
         }

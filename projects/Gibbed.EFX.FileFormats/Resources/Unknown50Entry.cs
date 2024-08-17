@@ -26,7 +26,7 @@ using Gibbed.Memory;
 
 namespace Gibbed.EFX.FileFormats.Resources
 {
-    public struct Unknown50ResourceEntry
+    public struct Unknown50Entry
     {
         public Vector4 Unknown00;
         public Vector4 Unknown10;
@@ -38,9 +38,9 @@ namespace Gibbed.EFX.FileFormats.Resources
         public byte[] Unknown64;
         public byte[] Unknown70;
 
-        public static Unknown50ResourceEntry Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
+        public static Unknown50Entry Read(ReadOnlySpan<byte> span, ref int index, Target target, Endian endian)
         {
-            Unknown50ResourceEntry instance;
+            Unknown50Entry instance;
             instance.Unknown00 = Vector4.Read(span, ref index, endian);
             instance.Unknown10 = Vector4.Read(span, ref index, endian);
             instance.Unknown20 = Vector4.Read(span, ref index, endian);
@@ -62,7 +62,7 @@ namespace Gibbed.EFX.FileFormats.Resources
             return instance;
         }
 
-        public static void Write(Unknown50ResourceEntry instance, IBufferWriter<byte> writer, Target target, Endian endian)
+        public static void Write(Unknown50Entry instance, IBufferWriter<byte> writer, Target target, Endian endian)
         {
             instance.Unknown00.Write(writer, endian);
             instance.Unknown10.Write(writer, endian);

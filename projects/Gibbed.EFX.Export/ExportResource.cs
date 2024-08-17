@@ -50,6 +50,10 @@ namespace Gibbed.EFX.Export
             {
                 Export(unknown50Resource, resourceTable);
             }
+            else if(command.Resource is Unknown51Resource unknown51Resource)
+            {
+                Export(unknown51Resource, resourceTable);
+            }
             else if (command.Resource is ModelResource modelResource)
             {
                 Export(modelResource, resourceTable);
@@ -127,7 +131,7 @@ namespace Gibbed.EFX.Export
             }
         }
 
-        private static void Export(Unknown50ResourceEntry entry, Tommy.TomlTable table)
+        private static void Export(Unknown50Entry entry, Tommy.TomlTable table)
         {
             table["u00"] = Export(entry.Unknown00);
             table["u10"] = Export(entry.Unknown10);
@@ -141,6 +145,37 @@ namespace Gibbed.EFX.Export
             {
                 table["u70"] = Export(entry.Unknown70);
             }
+        }
+
+        private static void Export(Unknown51Resource resource, Tommy.TomlTable table)
+        {
+            if (resource.Entries.Count > 0)
+            {
+                table.IsInline = false;
+
+                Tommy.TomlArray entriesArray = new()
+                {
+                    //IsTableArray = true,
+                    IsMultiline = true,
+                };
+
+                foreach (var entry in resource.Entries)
+                {
+                    Tommy.TomlTable entryTable = new();
+                    Export(entry, entryTable);
+                    entriesArray.Add(entryTable);
+                }
+
+                table["entries"] = entriesArray;
+            }
+        }
+
+        private static void Export(Unknown51Entry entry, Tommy.TomlTable table)
+        {
+            table["u00"] = Export(entry.Unknown00);
+            table["u08"] = entry.Unknown08;
+            table["u09"] = entry.Unknown09;
+            table["u0A"] = Export(entry.Unknown0A);
         }
 
         private static void Export(ModelResource resource, Tommy.TomlTable table)
